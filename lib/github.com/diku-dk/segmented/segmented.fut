@@ -6,9 +6,8 @@
 -- starts a segment and `false` continues a segment.
 def segmented_scan [n] 't (op: t -> t -> t) (ne: t)
                           (flags: [n]bool) (as: [n]t): [n]t =
-  (unzip (scan (\(x_flag,x) (y_flag,y) ->
-                (x_flag || y_flag,
-                 if y_flag then y else x `op` y))
+  (unzip (scan (\(_,x) (y_flag,y) ->
+                (y_flag, if y_flag then y else x `op` y))
           (false, ne)
           (zip flags as))).1
 
@@ -45,7 +44,7 @@ def replicated_iota [n] (reps:[n]i64) : []i64 =
   let s1 = scan (+) 0 reps
   let s2 = map2 (\i x -> if i==0 then 0 else x)
                 (iota n) (rotate (-1) s1)
-  let tmp = reduce_by_index (replicate (reduce (+) 0 reps) 0) i64.max 0 s2 (iota n)
+  let tmp = hist i64.max 0 (if n > 0 then last s1 else 0) s2 (iota n)
   let flags = map (>0) tmp
   in segmented_scan (+) 0 flags tmp
 
