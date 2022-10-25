@@ -48,6 +48,20 @@ def replicated_iota [n] (reps:[n]i64) : []i64 =
   let flags = map (>0) tmp
   in segmented_scan (+) 0 flags tmp
 
+
+-- Another useful utility function is called segmented_replicate.
+-- Given a one-dimensional replication array containing natural numbers
+-- and a data array of the same shape, segmented_replicate returns
+-- an array of size equal to the sum of the values in the replication
+-- array with values from the data array replicated according to the
+-- corresponding replication values. As an example, a call
+-- segmented_replicate [2,1,0,3,0] [5,6,9,8,4] result in the
+-- array [5,5,6,8,8,8].
+-- https://futhark-book.readthedocs.io/en/latest/regular-flattening.html
+def segmented_replicate [n] 't (revaluation_point_2d:[n]i64) (vs:[n]t) : []t =
+    let idxs = replicated_iota revaluation_point_2d
+    in map (\i -> vs[i]) idxs
+
 -- | Segmented iota. Given a flags array, the function returns an
 -- array of index sequences, each of which is reset according to the
 -- flags array. As an examples, segmented_iota
